@@ -1,0 +1,182 @@
+
+public class Main {
+
+        public static void main(String[] args) throws Myexception {
+                // attribut cjh
+                Attribut[] cjhpAtt = {
+                                new Attribut("idCours", new Domaine("VARCHAR")),
+                                new Attribut("jour", new Domaine("NUMBER")),
+                                new Attribut("heure", new Domaine("VARCHAR"))
+                };
+
+                // attribut cs
+                Attribut[] csAtt = {
+                                new Attribut("idCours", new Domaine("VARCHAR")),
+                                new Attribut("idSalle", new Domaine("VARCHAR"))
+                };
+                // attribut ena
+                Attribut[] enaAtt = {
+                                new Attribut("idEtudiant", new Domaine("NUMBER")),
+                                new Attribut("Nom", new Domaine("Nom")),
+                                new Attribut("Adresse", new Domaine("Adresse"))
+                };
+                // attribut cen
+                Attribut[] salAtt = {
+                                new Attribut("idCours", new Domaine("NUMBER")),
+                                new Attribut("idEtudiant", new Domaine("NUMBER")),
+                                new Attribut("Note", new Domaine("VARCHAR"))
+
+                };
+
+                // cjh
+                Relation cjh = new Relation("cjh", cjhpAtt);
+                Individu[] cjhIndividus = {
+                                // individu 1
+                                new Individu(
+                                                cjhpAtt,
+                                                new Object[] {
+                                                                "Archi",
+                                                                "Lu",
+                                                                "9h"
+                                                }),
+                                // individu 2
+                                new Individu(
+                                                cjhpAtt,
+                                                new Object[] {
+                                                                "Algo",
+                                                                "Ma",
+                                                                "9h"
+                                                }),
+                                // individu 3
+                                new Individu(
+                                                cjhpAtt,
+                                                new Object[] {
+                                                                "Algo",
+                                                                "Ve",
+                                                                "9h"
+                                                }),
+                                // individu 4
+                                new Individu(
+                                                cjhpAtt,
+                                                new Object[] {
+                                                                "Syst",
+                                                                "Ma",
+                                                                "14h"
+                                                }),
+                };
+
+                // cjh
+                Relation cs = new Relation("cs", csAtt);
+                Individu[] csindividus = {
+                                // individu 1
+                                new Individu(
+                                                csAtt,
+                                                new Object[] {
+                                                                "Archi",
+                                                                "S1",
+                                                }),
+                                // individu 2
+                                new Individu(
+                                                csAtt,
+                                                new Object[] {
+                                                                "Algo",
+                                                                "S2",
+                                                }),
+                                // individu 3
+                                new Individu(
+                                                csAtt,
+                                                new Object[] {
+                                                                "Syst",
+                                                                "S1"
+                                                }),
+                };
+                // ena
+                Relation ena = new Relation("ena", csAtt);
+                Individu[] enaindividus = {
+                                // individu 1
+                                new Individu(
+                                                enaAtt,
+                                                new Object[] {
+                                                                100,
+                                                                "Toto",
+                                                                "Nice",
+
+                                                }),
+                                // individu 2
+                                new Individu(
+                                                enaAtt,
+                                                new Object[] {
+                                                        200,
+                                                        "Tata",
+                                                        "Paris",
+                                                }),
+                                // individu 3
+                                new Individu(
+                                                enaAtt,
+                                                new Object[] {
+                                                        300,
+                                                        "Titi",
+                                                        "Rome",
+                                                }),
+                };
+
+                // insertion et initialisation
+                // insertion relation 1
+                cjh.setIndividus(cjhIndividus);
+                cjh.initializeEnsemble();
+                cs.setIndividus(csindividus);
+                cs.initializeEnsemble();
+                ena.setIndividus(enaindividus);
+                ena.initializeEnsemble();
+
+                // insertion relation 2
+                // sal.setIndividus(salIndividus);
+                // sal.initializeEnsemble();
+                cjh.show();
+                cs.show();
+                ena.sho
+
+                // union
+                // Relation unionEmpSal = emp.union(sal, "EmpSal");
+                // intersection
+                // Relation intersRelation = emp.intersect(sal, "Intersection");
+                // difference
+                // Relation diffRelation = emp.difference(sal, "difference");
+                // progection
+                // Relation projectionRelation = emp.projection(new Attribut[] {
+                // new Attribut("Empno", new Domaine("NUMBER"))
+
+                // });
+                // // produit cartesienne
+                // Relation produitcartesienne = emp.produitCartesien(projectionRelation,
+                // "prodiot");
+
+                // // selection
+                // Relation selectionRelation = emp.select(
+                // new Condition[] {
+                // new Condition(
+                // new Attribut("ename", new Domaine("varchar")),
+                // "=",
+                // "JACK", "or")
+
+                // });
+
+                // // join jointure
+                // Relation joined = emp.join(
+                // new Attribut("empno", new Domaine("number")),
+                // sal,
+                // new Attribut("empno", new Domaine("number")));
+                // // tetha joiture
+                // Relation tethajoined = emp.join(
+                // new Attribut("empno", new Domaine("number")),
+                // sal,
+                // new Attribut("empno", new Domaine("number")),
+                // new Condition[] {
+                // new Condition(new Attribut("prenom", new Domaine("varchar")),
+                // "=", "nanavo", "and"),
+                // new Condition(new Attribut("sal", new Domaine("decimal")),
+                // ">", 20.5)
+                // });
+                // tethajoined.show();
+        }
+}
