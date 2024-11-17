@@ -132,7 +132,7 @@ public class Main {
 
                 select.show();
 
-                Ensemble [] ensembles = union.getEnsembles();
+                // Ensemble [] ensembles = union.getEnsembles();
 
                 
         }
