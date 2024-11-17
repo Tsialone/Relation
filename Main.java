@@ -109,31 +109,50 @@ public class Main {
 
                                                 ),
                                                 new Individu(
-                                                        new Attribut[] {
-                                                                        new Attribut("Nom",
-                                                                                        "Caca sosy"),
-                                                                        new Attribut("Age", 5),
-                                                                        new Attribut("Salaire", "French"),
-                                                                        new Attribut("Hiredate", 0341) }
+                                                                new Attribut[] {
+                                                                                new Attribut("Nom",
+                                                                                                "Caca sosy"),
+                                                                                new Attribut("Age", 5),
+                                                                                new Attribut("Salaire", "French"),
+                                                                                new Attribut("Hiredate", 0341) }
 
-                                        )
+                                                )
                                 }
 
                 );
-                union.show();
 
                 Relation select = union.select(
-                                new Condition(
-                                        new Attribut("Salaire" ),
-                                         ">",
-                                        new Attribut("Age") )
-                                
-                );
+                                new Condition[] {
+                                                new Condition(
+                                                                new Attribut("Salaire"),
+                                                                "=",
+                                                                "French", "and"),
+                                                new Condition(
+                                                                new Attribut("Hiredate"),
+                                                                ">=",
+                                                                255, "or"),
+                                                new Condition(
+                                                                new Attribut("Age"),
+                                                                "=",
+                                                                5.7)
 
+                                });
+
+                union.show();
                 select.show();
+                Relation pro = select.produitCartesien(union, "popo");
+                Relation join  =  select.join(
+                   new Attribut("cjh.Age")     ,
+                 union,
+                   new Attribut("selected cjh.Age")
+                   );
 
-                // Ensemble [] ensembles = union.getEnsembles();
+                pro.show();
+                join.show();
 
-                
+                // System.out.println( Arrays.asList(pro.getAttributs()[0].getValeurs()) );
+
+              
+
         }
 }
