@@ -1,4 +1,9 @@
-import java.util.*;;
+package relation;
+
+import java.util.*;
+
+import exception.*;
+
 public class Condition {
     Attribut element1 ;
     Attribut element2 ;

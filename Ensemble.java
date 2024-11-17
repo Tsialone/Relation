@@ -1,29 +1,30 @@
+package relation;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import exception.*;
 
 public class Ensemble {
 
     Object[] elements;
     String nom;
-    Domaine domaine;
+    int limite;
     int taille;
 
-    public Ensemble(String nom, Object[] elements, Domaine domaine) throws Myexception {
+    public Ensemble(String nom, Object[] elements) throws Myexception {
 
         setNom(nom);
-        setDomaine(domaine);
-        setTaille(elements.length);
         setElements(elements);
-        // removeDuplicate();
+        removeDuplicate();
     }
 
-    public void setDomaine(Domaine domaine) {
-        this.domaine = domaine;
+    
+   public int  getTaille ()
+    {
+            return elements.length;
     }
 
-    public Domaine getDomaine() {
-        return domaine;
-    }
 
     public void setNom(String nom) throws Myexception {
         this.nom = nom;
@@ -33,9 +34,7 @@ public class Ensemble {
         return nom;
     }
 
-    public int getTaille() {
-        return taille;
-    }
+   
 
     public Object[] getElements() {
         return elements;
@@ -63,7 +62,7 @@ public class Ensemble {
         return taille;
     }
 
-    public boolean appartient(Object objet, Ensemble ensemble) {
+    public boolean appartient(Object objet) {
         for (Object object : elements) {
             if (object.equals(objet)) {
                 return true;
@@ -73,53 +72,7 @@ public class Ensemble {
     }
 
     public void setElements(Object[] elements) throws Myexception {
-        Integer globallimit = getDomaine().getLimit();
-        Integer decimallimit = getDomaine().getDecimallimit();
-        for (int i = 0; i < elements.length; i++) {
-            String type = Domaine.quelType(elements[i]);
-
-            // if (!Domaine.quelType(elements[i]).equalsIgnoreCase(getDomaine().getType())) {
-            //     throw new Myexception(
-            //             "L'element " + elements[i] + " ne correspond pas au domaine  " + getDomaine().getType());
-            // }
-            if ((type.equalsIgnoreCase("decimal"))) {
-
-                String d = String.valueOf(elements[i]);
-                String[] splited = d.split("\\.");
-
-                if (decimallimit != null && decimallimit != 0) {
-                    if (splited[0].length() > globallimit) {
-                        throw new Myexception("Erreur de precision entier sur " + elements[i]);
-                    }
-                    if (splited[1].length() > decimallimit) {
-                        throw new Myexception("Erreur de precision flottante sur " + elements[i]);
-
-                    }
-                } else {
-                    if (globallimit != null && splited[0].length() > globallimit) {
-                        throw new Myexception("Erreur de precision entier sur " + elements[i]);
-                    }
-                }
-
-            }
-            if (type.equalsIgnoreCase("varchar") || type.equalsIgnoreCase("number")) {
-                if (globallimit != null) {
-                    // System.out.println(globallimit);
-                    if (elements[i].toString().length() > globallimit) {
-
-                        throw new Myexception("Erreur de precision " + elements[i]);
-                    }
-                }
-
-            }
-            for (int j = i + 1; j < elements.length-1; j++) {
-                if (!Domaine.quelType(elements[i]).equalsIgnoreCase(Domaine.quelType(elements[j]))) {
-                    throw new Myexception(
-                            "Les elements ne sont pas dans le meme domaine sur " + elements[i] + " et " + elements[j]);
-                }
-
-            }
-        }
+        
         this.elements = elements;
     }
 
@@ -151,7 +104,7 @@ public class Ensemble {
                 }
             }
         }
-        Ensemble newensemble = new Ensemble(getNom(), nob.toArray(Object[]::new), getDomaine());
+        Ensemble newensemble = new Ensemble(getNom(), nob.toArray(Object[]::new));
         return newensemble;
     }
 
@@ -162,7 +115,7 @@ public class Ensemble {
 
         neo.addAll(Arrays.asList(e1ob));
         neo.addAll(Arrays.asList(e2ob));
-        Ensemble nEnsemble = new Ensemble(null, neo.toArray(Object[]::new), getDomaine());
+        Ensemble nEnsemble = new Ensemble(null, neo.toArray(Object[]::new));
         return nEnsemble;
     }
 
@@ -182,7 +135,7 @@ public class Ensemble {
             }
         }
 
-        Ensemble nEnsemble = new Ensemble(getNom(), neo.toArray(Object[]::new), getDomaine());
+        Ensemble nEnsemble = new Ensemble(getNom(), neo.toArray(Object[]::new));
         return nEnsemble;
     }
 

@@ -1,0 +1,8 @@
+javac -d . Myexception.java
+javac -d . Domaine.java
+javac -d . Attribut.java
+javac -d . Individu.java
+javac -d . Condition.java
+javac -d . Ensemble.java
+
+
