@@ -13,7 +13,6 @@ import exception.Myexception;
 
 public class Domaine {
 
-    String domaine;
     Class<?>[] valabletype = { String.class, Integer.class, Double.class, LocalDate.class };
     Class<?>[] types = new Class[0];
     Integer limit = null;
@@ -22,8 +21,10 @@ public class Domaine {
     String nom;
 
     public Domaine(String nom, Class<?> type, Ensemble ensemble, Integer limit) throws Myexception {
-
         setEnsemble(ensemble);
+        if (ensemble != null) {
+            ensemble.setElements(new Object[0]);
+        }
         isValableType(type);
         setLimit(limit);
         setNom(nom);
@@ -32,6 +33,7 @@ public class Domaine {
     }
     public void PushEnsembleElement (Object val) throws MatchException , Exception
     {   
+
         List<Object> EnsEle =  new ArrayList<>(Arrays.asList( ensemble.getElements()))  ;
         EnsEle.add(val);
         ensemble.setElements(EnsEle.toArray(new Object[0]));

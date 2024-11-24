@@ -105,19 +105,6 @@ public class Relation implements Cloneable {
 
     }
 
-    public void copyAttributValues(Individu individu) {
-        // Attribut[] indAttributs = individu.getAttributs();
-        // Attribut[] attributs = getAttributs();
-        // for ( i = 0; i < attributs.length; i++) {
-        // Attribut attInd = indAttributs[i];
-        // Attribut att = attributs[i];
-
-        // List<Object> indivAttOb = new ArrayList<>();
-        // List<Object> AttOb = new ArrayList<>(attInd.ge);
-
-        // }
-    }
-
     public Individu[] getIndividus() {
         return individus;
     }
@@ -165,7 +152,7 @@ public class Relation implements Cloneable {
             }
         } else if (element1 != null && element2 != null &&
                 validOperators.contains(operator)) {
-            int attributeIndex1 = findAttributeIndex( resultRelation. attributs, element1.getNom());
+            int attributeIndex1 = findAttributeIndex(resultRelation.attributs, element1.getNom());
             int attributeIndex2 = findAttributeIndex(resultRelation.attributs, element2.getNom());
             Object[] values1 = resultRelation.attributs[attributeIndex1].getValeurs();
             Object[] values2 = resultRelation.attributs[attributeIndex2].getValeurs();
@@ -179,21 +166,7 @@ public class Relation implements Cloneable {
             throw new Myexception("Erreur de condition " + cd.getOperator() + " ou" +
                     "élément null");
         }
-        // for (int i = 0; i < resultRelation.attributs.length; i++) {
-        // List<Object> lisOb = new ArrayList<>(
-        // Arrays.asList(resultRelation.attributs[i].getValeurs()));
-        // List<Object> finalOb = new ArrayList<>(lisOb);
-        // for (int j = 0; j < lisOb.size() - 1; j++) {
-        // if (!matchingIndexes.contains(j)) {
-        // finalOb.set(j, null);
-        // }
-        // }
-        // resultRelation.attributs[i].setValeurs(finalOb.toArray(new Object[0]));
-        // }
-        System.out.println(matchingIndexes);
-        System.out.println(
-                " >>>>>>>>>>>>." + Arrays.asList(resultRelation.attributs[0].getValeur()) + " "
-                        + resultRelation.attributs[0].getValeurs().length);
+
         for (int index : matchingIndexes) {
             Object[] values = new Object[resultRelation.attributs.length];
             for (int i = 0; i < resultRelation.attributs.length; i++) {
@@ -205,12 +178,9 @@ public class Relation implements Cloneable {
             individu.setValeurs(values);
             resultRelation.pushIndividu(individu);
         }
-        // System.out.println(
-        // Arrays.asList(resultRelation.getIndividus()[2].getValeurs()) );
         return resultRelation;
     }
 
-    // Méthode utilitaire pour trouver l'index d'un attribut
     private int findAttributeIndex(Attribut[] attributs, String attributeName)
             throws Myexception {
         for (int i = 0; i < attributs.length; i++) {
@@ -218,15 +188,9 @@ public class Relation implements Cloneable {
                 return i;
             }
         }
-
-        for (Attribut attribut : attributs) {
-            System.out.println(attribut.getNom() + " " + attributeName);
-        }
-
         throw new Myexception("Attribut non trouvé: " + attributeName);
     }
 
-    // // Méthode utilitaire pour comparer deux objets
     private boolean compare(Object obj1, Object obj2, String operator, Class<?> type) throws Myexception {
         switch (operator) {
             case "=":
@@ -257,13 +221,9 @@ public class Relation implements Cloneable {
 
                 } else {
                     return false;
-                    // throw new Myexception(
-                    // "Opération " + operator + " non valable pour le type " + type.getSimpleName()
-                    // + ".");
                 }
             default:
                 return false;
-            // throw new Myexception("Opérateur non valide: " + operator);
         }
     }
 
@@ -289,18 +249,15 @@ public class Relation implements Cloneable {
         };
     }
 
-    // // selected
     public Relation select(Condition[] conditions) throws Myexception, Exception {
         Relation resp = (Relation) this.clone();
 
         if (conditions.length == 1) {
             return select(conditions[0]);
         }
-        // System.out.println(resp.getEnsembles().length);
         List<Relation> listand = new ArrayList<>();
         List<Relation> listor = new ArrayList<>();
 
-        // System.out.println(conditions.length);
         for (int i = 0; i < conditions.length - 1; i++) {
             Condition cd = conditions[i];
             Condition cdplus = conditions[i + 1];
@@ -324,12 +281,6 @@ public class Relation implements Cloneable {
             }
         }
         int d = 1;
-        System.out.println("-----------and--------------");
-
-        for (Relation relation : listand) {
-            System.out.println("select " + d++);
-            // relation.show();
-        }
         for (int i = 0; i < conditions.length - 1; i++) {
             Condition cd = conditions[i];
             Condition cdplus = conditions[i + 1];
@@ -345,8 +296,6 @@ public class Relation implements Cloneable {
             String liaison = cd.getLiaison();
             if (liaison != null) {
                 if (cdmoins != null && cdplus != null) {
-                    // System.out.println("cdmoins.getLiaison()" + cdmoins.getLiaison());
-                    // System.out.println("cdplus.getLiaison()" + cdplus.getLiaison());
                     if (cd.getLiaison().equalsIgnoreCase("or")) {
 
                         if ((cdmoins.getLiaison() == null ||
@@ -368,32 +317,36 @@ public class Relation implements Cloneable {
                     }
                     Relation runioner = resp.select(cdplus);
                     listor.add(runioner);
-                    resp = resp.union(runioner, "liaison");
+                    resp = resp.union(runioner);
                 }
             }
 
         }
-        System.out.println("-----------or--------------");
-        for (Relation relation : listor) {
-            System.out.println("select " + d++);
-            // relation.show();
-        }
-        System.out.println(listand);
+
         listand.addAll(listor);
         for (Relation relation : listor) {
 
         }
         resp = new Relation("selected " + getNom(), attributs);
         for (int i = 0; i < listand.size(); i++) {
-            resp = resp.union(listand.get(i), nom);
+            resp = resp.union(listand.get(i));
         }
         return resp;
     }
+    public Relation clone() {
+        try {
+            return (Relation) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     // // jointure
-    public Relation join(Attribut attribut1, Relation r2, Attribut attribut2) throws Myexception
-    {
-    Relation resp = produitCartesien(r2,  getNom() + " join "+ r2.getNom() +" on "
-    +getNom()+ ".idcours = "+r2.getNom()+".idcours");
+    public Relation join(Attribut attribut1, Relation r2, Attribut attribut2) throws Myexception {
+        Relation resp = produitCartesien(r2);
+        resp.setNom(getNom() + " join " + r2.getNom() + " on "
+                + getNom() + ".idcours = " + r2.getNom() + ".idcours");
         Attribut att1 = null;
         Attribut att2 = null;
 
@@ -402,95 +355,26 @@ public class Relation implements Cloneable {
                 att1 = attribut;
             }
             if (attribut.getNom().equalsIgnoreCase(attribut2.getNom())) {
+
                 att2 = attribut;
             }
         }
-
-    Condition cd = new Condition(att1, "=", att2);
-    resp = resp.select(cd);
-    return resp;
+        Condition cd = new Condition(att1, "=", att2);
+        resp = resp.select(cd);
+        initializeAttByIndividu(resp);
+        return resp;
     }
 
     // // tetha jointure
-    // public Relation join(Attribut attribut1, Relation r2, Attribut attribut2,
-    // Condition[] conditions)
-    // throws Myexception {
-    // // if
-    // (!attribut1.getDomaine().getType().equalsIgnoreCase(attribut2.getDomaine().getType()))
-    // {
-    // // throw new Myexception(" colonne de type different sur " +
-    // attribut1.getDomaine().getType() + " et "
-    // // + attribut2.getDomaine().getType());
-    // // }
-    // // List<Attribut> attr1 = new ArrayList<>(Arrays.asList(getAttributs()));
-    // // List<Attribut> attr2 = new ArrayList<>(Arrays.asList(r2.getAttributs()));
-    // // attr1.addAll(attr2);
-    // // Attribut[] respAttributs = attr1.toArray(new Attribut[0]);
-    // // Relation resp = new Relation(
-    // // getNom() + " join " + r2.getNom() + " on " + getNom() + "." +
-    // attribut1.getNom() + " = " + r2.getNom()
-    // // + "." + attribut2.getNom(),
-    // // respAttributs);
-    // // List<Integer> listvalide1 = new ArrayList<>();
-    // // List<Integer> listvalide2 = new ArrayList<>();
-    // // int indexAattribut1 = 0;
-    // // int indexAattribut2 = 0;
-    // // for (int i = 0; i < attributs.length; i++) {
-    // // if (attributs[i].getNom().equalsIgnoreCase(attribut1.getNom())) {
-    // // indexAattribut1 = i;
-    // // }
-    // // }
-    // // for (int i = 0; i < r2.getAttributs().length; i++) {
-    // // if (r2.getAttributs()[i].getNom().equalsIgnoreCase(attribut2.getNom())) {
-    // // indexAattribut2 = i;
-    // // }
-    // // }
-    // // Ensemble ensemble1[] = getEnsembles();
-    // // Ensemble ensemble2[] = r2.getEnsembles();
-    // // Object[] elemObjects1 = ensemble1[indexAattribut1].getElements();
-    // // Object[] elemObjects2 = ensemble2[indexAattribut2].getElements();
-    // // Ensemble inter =
-    // ensemble1[indexAattribut1].intersection(ensemble2[indexAattribut2]);
-    // // List<Object> dr = Arrays.asList(inter.getElements());
-    // // for (int i = 0; i < elemObjects1.length; i++) {
-    // // if (dr.contains(elemObjects1[i])) {
-    // // listvalide1.add(i);
-    // // }
-    // // }
-    // // for (int i = 0; i < elemObjects2.length; i++) {
-    // // if (dr.contains(elemObjects2[i])) {
-    // // listvalide2.add(i);
-    // // }
-    // // }
-    // // for (int i = 0; i < listvalide1.size(); i++) {
-    // // List<Object> indiObjects = new ArrayList<>();
-    // // for (int j = 0; j < ensemble1.length; j++) {
-    // // indiObjects.add(ensemble1[j].getElements()[listvalide1.get(i)]);
-    // // }
-
-    // // for (int j = 0; j < ensemble2.length; j++) {
-    // // if ( i < listvalide2.size()) {
-
-    // // indiObjects.add(ensemble2[j].getElements()[listvalide2.get(i)]);
-    // // }
-    // // else
-    // // {
-    // // indiObjects.add("null");
-
-    // // }
-    // // }
-    // // Individu individu = new Individu(respAttributs, indiObjects.toArray(new
-    // Object[0]));
-    // // resp.insert(individu);
-    // // }
-
-    // Relation resp = join(attribut1, r2, attribut2);
-    // resp = resp.select(conditions);
-    // return resp;
-    // }
+    public Relation join(Attribut attribut1, Relation r2, Attribut attribut2,
+            Condition[] conditions) throws Myexception, Exception {
+        Relation resp = join(attribut1, r2, attribut2);
+        resp = resp.select(conditions);
+        return resp;
+    }
 
     // // produit cartesien
-    public Relation produitCartesien(Relation r2, String nom) throws Myexception {
+    public Relation produitCartesien(Relation r2) throws Myexception {
         Individu[] r1Individus = getIndividus();
         Attribut[] r1Attributs = getAttributs();
         Individu[] r2Individus = r2.getIndividus();
@@ -499,18 +383,26 @@ public class Relation implements Cloneable {
                 r2Attributs.length];
 
         for (int i = 0; i < r1Attributs.length; i++) {
-            nouveauxAttributs[i] = new Attribut(getNom() + "." + r1Attributs[i].getNom(),
+            nouveauxAttributs[i] = new Attribut(r1Attributs[i].getNom(),
                     r1Attributs[i].getDomaine());
         }
 
         for (int i = 0; i < r2Attributs.length; i++) {
-            nouveauxAttributs[r1Attributs.length + i] = new Attribut(r2.getNom() + "." +
-                    r2Attributs[i].getNom(), r2Attributs[i].getDomaine());
+
+            nouveauxAttributs[r1Attributs.length + i] = new Attribut(r2Attributs[i].getNom(), r2Attributs[i].getDomaine());
 
         }
+      
+       
+        
+
+
+       
+
 
         Relation produitRelation = new Relation(nom, nouveauxAttributs);
-        List<Object>  valeursAtt = new ArrayList<>();
+        produitRelation.setNom("produit cartesienne entre (" + getNom() + " et " + r2.getNom() + ")");
+        List<Object> valeursAtt = new ArrayList<>();
         for (Individu r1Individu : r1Individus) {
             for (Individu r2Individu : r2Individus) {
                 Object[] valeursCombinees = new Object[nouveauxAttributs.length];
@@ -518,21 +410,65 @@ public class Relation implements Cloneable {
                         r1Attributs.length);
                 System.arraycopy(r2Individu.getValeurs(), 0, valeursCombinees,
                         r1Attributs.length, r2Attributs.length);
-
                 Individu nouveauIndividu = new Individu(nouveauxAttributs);
-                
                 nouveauIndividu.setValeurs(valeursCombinees);
                 produitRelation.pushIndividu(
                         nouveauIndividu);
             }
         }
+        produitRelation.SetRepetitionAtt();
         initializeAttByIndividu(produitRelation);
         return produitRelation;
     }
+    public void SetRepetitionAtt ()
+    {
+        List<String> nameAtt = new ArrayList<>();
+        for (Attribut attribut : getAttributs()) {
+            String attNom = attribut.getNom().toLowerCase();
+            attribut.setNom(attNom);
+           
+            nameAtt.add(attNom);
+        }  
+        removeTrait();
+        nameAtt = nameAtt.stream().distinct().toList();
+        HashMap<String , Integer> mapAtt =  new HashMap<>();
+        for (String string : nameAtt) {
+            mapAtt.put(string , 0);
+        }
+        nameAtt = new ArrayList<>();
+        for (Attribut attribut : getAttributs()) {
+            String attNom = attribut.getNom().toLowerCase();
+            attribut.setNom(attNom);
+            if (nameAtt.contains(attNom)) {
+                Integer repetition = mapAtt.get(attNom);
+                repetition++;
+                mapAtt.replace(attNom, repetition);
+                attribut.setNom(attNom + "_" + mapAtt.get(attNom));
+
+            }
+            nameAtt.add(attNom);
+        }  
+    }
+    public void removeTrait  ()
+    {
+        for (int i = 0; i < attributs.length ; i++) {
+        
+            String string = attributs[i].getNom();
+            String [] explode = string.split("_");
+            if (explode.length  == 2) {
+                    string =  explode[0];
+                    attributs[i].setNom(explode[0]);
+            }   
+        }
+    }
+    public void renameAtt (Attribut[] attributs)
+    {
+
+    }
 
     public void initializeAttByIndividu(Relation rela) {
-        Attribut[] att = rela . getAttributs();
-        Individu[] individus =rela . getIndividus();
+        Attribut[] att = rela.getAttributs();
+        Individu[] individus = rela.getIndividus();
         if (att == null || individus == null) {
             throw new IllegalArgumentException("Attributes or Individuals cannot be null");
         }
@@ -540,9 +476,7 @@ public class Relation implements Cloneable {
             att[j].setValeurs(new Object[individus.length]);
             for (int i = 0; i < individus.length; i++) {
                 Object[] individuValeurs = individus[i].getValeurs();
-                if (individuValeurs != null && i < individuValeurs.length) {
-                    att[j].getValeurs()[i] = individuValeurs[j]; 
-                }
+                att[j].getValeurs()[i] = individuValeurs[j];
             }
         }
     }
@@ -554,13 +488,18 @@ public class Relation implements Cloneable {
         for (Attribut attrProj : attributsProjection) {
             for (Attribut attr : r1Attributs) {
                 if (attr.getNom().equalsIgnoreCase(attrProj.getNom())) {
+                    attrProj.setDomaine(attr.getDomaine());
                     can++;
                     break;
                 }
             }
         }
         if (can == attributsProjection.length) {
-            Relation pRelation = new Relation("projection", attributsProjection);
+            List<String> nameAtt = new ArrayList<>();
+            for (Attribut att : attributsProjection) {
+                nameAtt.add(att.getNom());
+            }
+            Relation pRelation = new Relation("projection de " + getNom() +">>("+nameAtt+")", attributsProjection);
 
             for (Individu individu : r1Individus) {
                 Object[] valeursProjetes = new Object[attributsProjection.length];
@@ -591,26 +530,23 @@ public class Relation implements Cloneable {
         setAttributs(attt.toArray(new Attribut[0]));
     }
 
-    public Relation difference(Relation r2, String name) throws Myexception {
+    public Relation difference(Relation r2) throws Myexception {
         if (r2 == null) {
             throw new Myexception("The second relation (r2) cannot be null.");
         }
         if (!checkAttribut(r2)) {
             throw new Myexception("Attributes of the two relations do not match.");
         }
-        List<Individu> diffIndividus = new ArrayList<>(Arrays.asList(getIndividus()));
-        List<Individu> resp = new ArrayList<>(diffIndividus);
-        int i = 0;
-        for (Individu r1Individu : diffIndividus) {
-            for (Individu r2Individu : r2.getIndividus()) {
-                if (r1Individu.equals(r2Individu)) {
-                    resp.remove(i);
-                }
+    
+        Set<Individu> r2IndividusSet = new HashSet<>(Arrays.asList(r2.getIndividus()));
+        List<Individu> diffIndividus = new ArrayList<>();
+        for (Individu r1Individu : getIndividus()) {
+            if (!r2IndividusSet.contains(r1Individu)) {
+                diffIndividus.add(r1Individu);
             }
-            i++;
         }
-        Relation diffRelation = new Relation(name, attributs);
-        diffRelation.setIndividus(resp.toArray(new Individu[0]));
+        Relation diffRelation = new Relation("diff("+getNom()+ "  "  + r2.getNom() +   ")", attributs);
+        diffRelation.setIndividus(diffIndividus.toArray(new Individu[0]));
         return diffRelation;
     }
 
@@ -628,7 +564,7 @@ public class Relation implements Cloneable {
         Individu[] r1Individus = getIndividus();
         Individu[] r2Individus = r2.getIndividus();
         ArrayList<Individu> interseIndividus = new ArrayList<>();
-        Relation interRelation = new Relation(name, attributs);
+        Relation interRelation = new Relation("intersect("+getNom() + "  " +  r2.getNom()  +")", attributs);
         if (checkAttribut(r2)) {
             for (int i = 0; i < r1Individus.length; i++) {
                 for (int j = 0; j < r2Individus.length; j++) {
@@ -643,7 +579,6 @@ public class Relation implements Cloneable {
         return interRelation;
     }
 
-    // // voir si lindividu peut etre inserer dans une relation
     public void inserable(Individu individu) throws Myexception {
         if (individu == null) {
             throw new IllegalArgumentException("Individu cannot be null.");
@@ -810,10 +745,13 @@ public class Relation implements Cloneable {
     // // une methode pour avoir une relation qui est l'union de cette relation avec
     // r2
 
-    public Relation union(Relation r2, String nameUnion) throws Myexception, Exception {
+    public Relation union(Relation r2) throws Myexception, Exception {
         Relation resp = (Relation) this.clone();
         Attribut[] r1Att = getAttributs();
         Attribut[] r2Att = r2.getAttributs();
+        if (r1Att.length != r2Att.length) {
+            throw new Myexception("Le nombre d'attribut de "+getNom()+"=  "+r1Att.length+" et  "+r2.getNom()+"= "+r2Att.length+" doit etre le meme");
+        }
         List<Individu> individus = new ArrayList<>();
         if (checkAttribut(r2)) {
             for (int i = 0; i < r1Att.length; i++) {
@@ -828,7 +766,8 @@ public class Relation implements Cloneable {
                     }
 
                 }
-                // r1Att[i].getDomaine().setNom(r1Att[i].getNom() + "_" + r2Att[i].getNom() + "_Domaine");
+                // r1Att[i].getDomaine().setNom(r1Att[i].getNom() + "_" + r2Att[i].getNom() +
+                // "_Domaine");
                 // r1Att[i].setNom(r1Att[i].getNom() + "_" + r2Att[i].getNom());
                 r1Att[i].pushValeurs(r2Att[i].getValeurs());
             }
@@ -838,7 +777,7 @@ public class Relation implements Cloneable {
         for (int i = 0; i < r2.getIndividus().length; i++) {
             resp.pushIndividu(r2.getIndividus()[i]);
         }
-        // resp.setNom(resp.getNom() + "_union_" + r2.getNom());
+        resp.setNom("(" + resp.getNom() + ")_union_(" + r2.getNom() + ")");
         resp.distinct();
         return resp;
     }

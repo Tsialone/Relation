@@ -9,6 +9,7 @@ public class Attribut {
     Domaine domaine;
     Object [] valeurs = new Object[0];
     Object valeur;
+    int repetitionNom = 0;
     public Attribut (String nom , Domaine domaine)
     {
         this.nom = nom;
@@ -16,6 +17,12 @@ public class Attribut {
         // if (domaine.getEnsemble() != null) {
         //     setValeurs(domaine.getEnsemble().getElements());
         // }
+    }
+    public void setRepetitionNom(int repetitionNom) {
+        this.repetitionNom = repetitionNom;
+    }
+    public int getRepetitionNom() {
+        return repetitionNom;
     }
     public Attribut (String nom )
     {
@@ -27,6 +34,9 @@ public class Attribut {
         List<Object> ini = new ArrayList<>(Arrays.asList(getValeurs()));
         ini.addAll(insert);
         setValeurs(ini.toArray(new Object[0]));
+    }
+    public void setDomaine(Domaine domaine) {
+        this.domaine = domaine;
     }
     public Attribut (String nom , Object valeur)
     {
