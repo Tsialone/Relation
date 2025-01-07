@@ -114,6 +114,7 @@ public class Relation implements Cloneable {
     }
 
     public Relation select(Condition cd) throws Myexception {
+        initializeAttByIndividu(this);
         Class<?> constanteType = null;
         for (Attribut att : getAttributs()) {
             if (cd.getElement1() != null && att.getNom().equalsIgnoreCase(cd.getElement1().getNom())) {
@@ -129,6 +130,7 @@ public class Relation implements Cloneable {
         if (cd.getConstante() != null) {
             constanteType = cd.getConstante().getClass();
         }
+        
         List<Class<?>> attributType = new ArrayList<>(Arrays.asList(cd.getElement1().getDomaine().getType()));
         if (constanteType != null && !attributType.contains(constanteType)) {
             throw new Myexception("L'élément et la constante doivent être dans un mêmedomaine: " + constanteType
@@ -177,7 +179,10 @@ public class Relation implements Cloneable {
             Individu individu = new Individu(resultRelation.attributs);
             individu.setValeurs(values);
             resultRelation.pushIndividu(individu);
+
         }
+
+        // initializeAttByIndividu(resultRelation);
         return resultRelation;
     }
 
@@ -250,89 +255,43 @@ public class Relation implements Cloneable {
     }
 
     public Relation select(Condition[] conditions) throws Myexception, Exception {
-        Relation resp = (Relation) this.clone();
-
+        Relation resp = null;
+        
         if (conditions.length == 1) {
             return select(conditions[0]);
         }
-        List<Relation> listand = new ArrayList<>();
-        List<Relation> listor = new ArrayList<>();
-
-        for (int i = 0; i < conditions.length - 1; i++) {
-            Condition cd = conditions[i];
-            Condition cdplus = conditions[i + 1];
-            String liaison = cd.getLiaison();
-            if (liaison != null) {
-                if (cd.getLiaison().equalsIgnoreCase("and")) {
-                    if (resp.getIndividus().length != 0) {
-                        resp = select(cd);
-                        // System.out.println("popopopopopopopopo" + resp.getIndividus().length);
-                        resp = resp.select(cdplus);
-                        // resp.show();
-                        listand.add(resp);
-                    }
-                }
-                if (cd.getLiaison().equalsIgnoreCase("or")) {
-                    resp = new Relation("lia", attributs);
-                    for (Individu individu : individus) {
-                        resp.pushIndividu(individu);
-                    }
-                }
-            }
-        }
-        int d = 1;
         for (int i = 0; i < conditions.length - 1; i++) {
             Condition cd = conditions[i];
             Condition cdplus = conditions[i + 1];
             Condition cdmoins = null;
+            String liaison = cd.getLiaison();
             if (i > 0) {
                 cdmoins = conditions[i - 1];
             }
-            String cdmoinsliasions = null;
-            if (cdmoins != null) {
-                cdmoinsliasions = cdmoins.getLiaison();
-            }
-
-            String liaison = cd.getLiaison();
-            if (liaison != null) {
-                if (cdmoins != null && cdplus != null) {
-                    if (cd.getLiaison().equalsIgnoreCase("or")) {
-
-                        if ((cdmoins.getLiaison() == null ||
-                                !cdmoins.getLiaison().equalsIgnoreCase("and"))) {
-                            listor.add(select(cd));
-                        }
-                        if ((cdplus.getLiaison() == null ||
-                                !cdplus.getLiaison().equalsIgnoreCase("and"))) {
-                            listor.add(select(cdplus));
-                        }
-                    }
+            try {
+               if (cd.ge) {
+                
+               }
+                if (liaison.equalsIgnoreCase("and")) {
+                    System.out.println("miditra and");
+                    resp = select(cd);
+                    resp = resp.select(cdplus);
+                    resp.show();
                 }
-
-                if (cdmoins == null && cd.getLiaison().equalsIgnoreCase("or")) {
-
-                    resp = new Relation("lia", attributs);
-                    for (Individu individu : individus) {
-                        resp.pushIndividu(individu);
+                if (liaison.equalsIgnoreCase("or")) {
+                    System.out.println("miditra or");
+                    if (resp != null) {
+                        resp = resp.union(select(cdplus));
                     }
-                    Relation runioner = resp.select(cdplus);
-                    listor.add(runioner);
-                    resp = resp.union(runioner);
+                    resp = select(cdplus);
+                    resp.show();
                 }
+            } catch (Exception e) {
             }
-
-        }
-
-        listand.addAll(listor);
-        for (Relation relation : listor) {
-
-        }
-        resp = new Relation("selected " + getNom(), attributs);
-        for (int i = 0; i < listand.size(); i++) {
-            resp = resp.union(listand.get(i));
         }
         return resp;
     }
+
     public Relation clone() {
         try {
             return (Relation) super.clone();
@@ -344,12 +303,9 @@ public class Relation implements Cloneable {
 
     // // jointure
     public Relation join(Attribut attribut1, Relation r2, Attribut attribut2) throws Myexception {
-        Relation resp = produitCartesien(r2);
-        resp.setNom(getNom() + " join " + r2.getNom() + " on "
-                + getNom() + ".idcours = " + r2.getNom() + ".idcours");
+        Relation resp = this;
         Attribut att1 = null;
         Attribut att2 = null;
-
         for (Attribut attribut : resp.getAttributs()) {
             if (attribut.getNom().equalsIgnoreCase(attribut1.getNom())) {
                 att1 = attribut;
@@ -366,11 +322,10 @@ public class Relation implements Cloneable {
     }
 
     // // tetha jointure
-    public Relation join(Attribut attribut1, Relation r2, Attribut attribut2,
+    public Relation join(Relation r2,
             Condition[] conditions) throws Myexception, Exception {
-        Relation resp = join(attribut1, r2, attribut2);
-        resp = resp.select(conditions);
-        return resp;
+        Relation resp = produitCartesien(r2);
+        return resp.select(conditions);
     }
 
     // // produit cartesien
@@ -389,16 +344,10 @@ public class Relation implements Cloneable {
 
         for (int i = 0; i < r2Attributs.length; i++) {
 
-            nouveauxAttributs[r1Attributs.length + i] = new Attribut(r2Attributs[i].getNom(), r2Attributs[i].getDomaine());
+            nouveauxAttributs[r1Attributs.length + i] = new Attribut(r2Attributs[i].getNom(),
+                    r2Attributs[i].getDomaine());
 
         }
-      
-       
-        
-
-
-       
-
 
         Relation produitRelation = new Relation(nom, nouveauxAttributs);
         produitRelation.setNom("produit cartesienne entre (" + getNom() + " et " + r2.getNom() + ")");
@@ -420,20 +369,20 @@ public class Relation implements Cloneable {
         initializeAttByIndividu(produitRelation);
         return produitRelation;
     }
-    public void SetRepetitionAtt ()
-    {
+
+    public void SetRepetitionAtt() {
         List<String> nameAtt = new ArrayList<>();
         for (Attribut attribut : getAttributs()) {
             String attNom = attribut.getNom().toLowerCase();
             attribut.setNom(attNom);
-           
+
             nameAtt.add(attNom);
-        }  
+        }
         removeTrait();
         nameAtt = nameAtt.stream().distinct().toList();
-        HashMap<String , Integer> mapAtt =  new HashMap<>();
+        HashMap<String, Integer> mapAtt = new HashMap<>();
         for (String string : nameAtt) {
-            mapAtt.put(string , 0);
+            mapAtt.put(string, 0);
         }
         nameAtt = new ArrayList<>();
         for (Attribut attribut : getAttributs()) {
@@ -447,35 +396,35 @@ public class Relation implements Cloneable {
 
             }
             nameAtt.add(attNom);
-        }  
-    }
-    public void removeTrait  ()
-    {
-        for (int i = 0; i < attributs.length ; i++) {
-        
-            String string = attributs[i].getNom();
-            String [] explode = string.split("_");
-            if (explode.length  == 2) {
-                    string =  explode[0];
-                    attributs[i].setNom(explode[0]);
-            }   
         }
     }
-    public void renameAtt (Attribut[] attributs)
-    {
+
+    public void removeTrait() {
+        for (int i = 0; i < attributs.length; i++) {
+
+            String string = attributs[i].getNom();
+            String[] explode = string.split("_");
+            if (explode.length == 2) {
+                string = explode[0];
+                attributs[i].setNom(explode[0]);
+            }
+        }
+    }
+
+    public void renameAtt(Attribut[] attributs) {
 
     }
 
     public void initializeAttByIndividu(Relation rela) {
         Attribut[] att = rela.getAttributs();
-        Individu[] individus = rela.getIndividus();
-        if (att == null || individus == null) {
+        Individu[] indi = rela.getIndividus();
+        if (att == null || indi == null) {
             throw new IllegalArgumentException("Attributes or Individuals cannot be null");
         }
         for (int j = 0; j < att.length; j++) {
-            att[j].setValeurs(new Object[individus.length]);
-            for (int i = 0; i < individus.length; i++) {
-                Object[] individuValeurs = individus[i].getValeurs();
+            att[j].setValeurs(new Object[indi.length]);
+            for (int i = 0; i < indi.length; i++) {
+                Object[] individuValeurs = indi[i].getValeurs();
                 att[j].getValeurs()[i] = individuValeurs[j];
             }
         }
@@ -499,7 +448,7 @@ public class Relation implements Cloneable {
             for (Attribut att : attributsProjection) {
                 nameAtt.add(att.getNom());
             }
-            Relation pRelation = new Relation("projection de " + getNom() +">>("+nameAtt+")", attributsProjection);
+            Relation pRelation = new Relation("projection de " + getNom() + ">>(" + nameAtt + ")", attributsProjection);
 
             for (Individu individu : r1Individus) {
                 Object[] valeursProjetes = new Object[attributsProjection.length];
@@ -537,7 +486,7 @@ public class Relation implements Cloneable {
         if (!checkAttribut(r2)) {
             throw new Myexception("Attributes of the two relations do not match.");
         }
-    
+
         Set<Individu> r2IndividusSet = new HashSet<>(Arrays.asList(r2.getIndividus()));
         List<Individu> diffIndividus = new ArrayList<>();
         for (Individu r1Individu : getIndividus()) {
@@ -545,7 +494,7 @@ public class Relation implements Cloneable {
                 diffIndividus.add(r1Individu);
             }
         }
-        Relation diffRelation = new Relation("diff("+getNom()+ "  "  + r2.getNom() +   ")", attributs);
+        Relation diffRelation = new Relation("diff(" + getNom() + "  " + r2.getNom() + ")", attributs);
         diffRelation.setIndividus(diffIndividus.toArray(new Individu[0]));
         return diffRelation;
     }
@@ -564,7 +513,7 @@ public class Relation implements Cloneable {
         Individu[] r1Individus = getIndividus();
         Individu[] r2Individus = r2.getIndividus();
         ArrayList<Individu> interseIndividus = new ArrayList<>();
-        Relation interRelation = new Relation("intersect("+getNom() + "  " +  r2.getNom()  +")", attributs);
+        Relation interRelation = new Relation("intersect(" + getNom() + "  " + r2.getNom() + ")", attributs);
         if (checkAttribut(r2)) {
             for (int i = 0; i < r1Individus.length; i++) {
                 for (int j = 0; j < r2Individus.length; j++) {
@@ -602,7 +551,6 @@ public class Relation implements Cloneable {
         }
     }
 
-    // Helper method to validate attribute names
     private void validateAttributeNames(Attribut att1, Attribut att2) throws Myexception {
         if (!att1.getNom().equalsIgnoreCase(att2.getNom())) {
             throw new Myexception("In " + getNom() + ", attribute names do not match: "
@@ -661,51 +609,6 @@ public class Relation implements Cloneable {
         att1.setValeurs(att.toArray(new Object[0]));
     }
 
-    // // voir si la valeur inbriquer est conforme a une taille donne
-    // public boolean limited(Individu individu) throws Myexception {
-    // Attribut[] indivAttributs = individu.getAttributs();
-    // Object[] indivValeur = individu.getValeurs();
-    // int i = 0;
-    // int plage = indivAttributs.length;
-    // while (i < plage) {
-
-    // Integer limit = indivAttributs[i].getDomaine().getLimit();
-    // if (limit != null) {
-    // String valeur = indivValeur[i].toString();
-    // if (valeur.length() > limit) {
-    // throw new Myexception ("Out of precision for " + nom + "....");
-    // // System.out.println("Out of precision for " + nom + "....");
-    // // return false;
-    // }
-    // }
-
-    // i++;
-    // }
-    // return true;
-    // }
-
-    // // voir si les valeurs dun individu se conforme a lattribut
-    // public boolean alignerAV(Individu individu) throws Myexception {
-    // Attribut[] indivAttributs = individu.getAttributs();
-    // Object[] indivValeur = individu.getValeurs();
-    // int i = 0;
-    // int plage = indivAttributs.length;
-    // while (i < plage) {
-    // String attributType = indivAttributs[i].getDomaine().getType();
-    // String valuerType = Domaine.quelType(indivValeur[i]);
-    // if (!attributType.equalsIgnoreCase(valuerType)) {
-
-    // throw new Myexception("the attribut type " + attributType + " from " +
-    // this.nom
-    // + " not match for values of type " + valuerType + " from individu." +
-    // indivAttributs[i].getNom()
-    // + " please check your insert....");
-    // }
-    // i++;
-    // }
-    // return true;
-    // }
-
     // // affiche la relation
     public void show() {
         System.out.printf("%-20s%n", "(" + getNom() + ")");
@@ -750,7 +653,8 @@ public class Relation implements Cloneable {
         Attribut[] r1Att = getAttributs();
         Attribut[] r2Att = r2.getAttributs();
         if (r1Att.length != r2Att.length) {
-            throw new Myexception("Le nombre d'attribut de "+getNom()+"=  "+r1Att.length+" et  "+r2.getNom()+"= "+r2Att.length+" doit etre le meme");
+            throw new Myexception("Le nombre d'attribut de " + getNom() + "=  " + r1Att.length + " et  " + r2.getNom()
+                    + "= " + r2Att.length + " doit etre le meme");
         }
         List<Individu> individus = new ArrayList<>();
         if (checkAttribut(r2)) {

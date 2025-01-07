@@ -200,51 +200,41 @@ public class Main {
                                 });
 
                 cjh.show();
-                Relation jointure = cjh.join(
-                                new Attribut("idCours"),
-                                cen,
-                                new Attribut("idCours_1"));
 
-                Relation select = jointure.select(
-
+                Relation select = cen.select(
                                 new Condition[] {
                                                 new Condition(
-                                                                new Attribut("idcours_1"),
+                                                                new Attribut("Note"),
                                                                 "=",
-                                                                "Archi")
-                                }
+                                                                "A",
+                                                                "or"),
+                                                new Condition(
+                                                                new Attribut("idEtudiant"),
+                                                                ">=",
+                                                                100,
+                                                                "and"),
+                                                new Condition(
+                                                                new Attribut("idEtudiant"),
+                                                                "=",
+                                                                200,
+                                                                "and"),
 
-                );
+                                                new Condition(
+                                                                new Attribut("idCours"),
+                                                                "=",
+                                                                "Syst"),
+                                });
+                System.out.println("valiny");
+                select.show();
 
-                Relation etudiantNote = jointure.join(
-                                new Attribut("idetudiant"),
-                                ena,
-                                new Attribut("idetudiant_1"));
-
-                jointure.show();
-                etudiantNote.show();
-
-
-                Relation projected  =  etudiantNote.projection(
-                                new Attribut[]{
-                                        new Attribut("idetudiant_1"),
-                                        new Attribut("nom"),
-                                        new Attribut("note")
-
-                                }
-
-                );
-
-                projected.show();
-
-                Relation intersection = projected.intersect(projected, "fewfew");
-                Relation intersectionDel = intersection.clone();
-                intersectionDel.delIndividu(intersection.getIndividus()[5]);
-               
-               
-                intersection.show();
-                intersectionDel.show();
-                Relation diff  = intersection.difference(intersectionDel);
-                // select.show();
+                Relation jointure = cjh.join(
+                                cen,
+                                new Condition[] {
+                                                new Condition(
+                                                                new Attribut("idCours_1"),
+                                                                "=",
+                                                                new Attribut("idCours"))
+                                });
+                        jointure.show();
         }
 }

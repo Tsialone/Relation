@@ -80,13 +80,16 @@ FROM
 
 
 SELECT 
-    CJH.IdCours, 
-    CJH.Jour, 
-    CJH.Heure, 
-    CEN.IdEtudiant, 
-    CEN.Note
+    CJH.*, 
+    CEN.*
 FROM 
-    CJH, CEN
+    CJH 
 WHERE 
     CJH.IdCours = CEN.IdCours;
 
+SELECT 
+    * 
+    FROM 
+         CEN
+    WHERE  
+        NOTE = 'A'  OR IDETUDIANT >= 100  AND IDETUDIANT = 200; 
